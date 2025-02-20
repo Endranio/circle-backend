@@ -1,14 +1,24 @@
-import express from 'express'
-import dotenv from 'dotenv'
-dotenv.config()
+import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const app=express()
-const port = process.env.PORT
+const app = express();
+app.use(express.json());
+const port = process.env.PORT;
 
-app.get("/",(req,res)=>{
-    res.send("Welcome to circle API")
-})
+app.get('/', (req: Request, res: Response) => {
+  res.send('Welcome to circle API');
+});
+app.delete('/', (req: Request, res: Response) => {
+  res.send('Welcome to circle API');
+});
+app.patch('/', (req: Request, res: Response) => {
+  res.send('Welcome to circle API');
+});
+app.post('/', (req: Request, res: Response) => {
+  res.send('Welcome to circle API');
+});
 
-app.listen(port, ()=>{
-    console.info(`server running at port ${port}` )
-})
+app.listen(port, () => {
+  console.info(`server running at port ${port}`);
+});

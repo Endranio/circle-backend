@@ -1,1 +1,1 @@
-echo " precommit jalan"
+npx lint-staged
