@@ -18,10 +18,13 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.4.0",
+    "@types/joi": "^17.2.2",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
