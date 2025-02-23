@@ -50,7 +50,7 @@ class userController {
       const user = await userService.getUserById(id);
       if (!user) {
         res.status(404).json({
-          massage: 'user not found',
+          message: 'user not found',
         });
         return;
       }
