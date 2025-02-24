@@ -14,6 +14,18 @@ import { transporter } from '../libs/nodemailer';
 
 class AuthController {
   async login(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/LoginDTO"
+                    }  
+                }
+            }
+        } 
+    */
+
     try {
       const body = req.body;
       const { email, password } = await loginSchema.validateAsync(body);
@@ -56,6 +68,18 @@ class AuthController {
   }
 
   async register(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/RegisterDTO"
+                    }  
+                }
+            }
+        } 
+    */
+
     try {
       const body = req.body;
       const validated = await registerSchema.validateAsync(body);
@@ -82,6 +106,18 @@ class AuthController {
     }
   }
   async forgot(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/ForgotPasswordDTO"
+                    }  
+                }
+            }
+        } 
+    */
+
     try {
       const body = req.body;
       const { email } = await forgotPasswordSchema.validateAsync(body);
@@ -112,6 +148,18 @@ class AuthController {
     }
   }
   async reset(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                $ref: "#/components/schemas/ResetPasswordDTO"
+            }  
+        }
+    }
+} 
+*/
+
     try {
       const payload = (req as any).user;
       const body = req.body;

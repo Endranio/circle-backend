@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "threads" ALTER COLUMN "images" DROP NOT NULL,
+ALTER COLUMN "images" SET DATA TYPE TEXT;
