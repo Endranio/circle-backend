@@ -28,7 +28,7 @@ const doc = {
       RegisterDTO: {
         type: 'object',
         properties: {
-          fullName: { type: 'string' },
+          fullname: { type: 'string' },
           username: { type: 'string' },
           email: { type: 'string' },
           password: { type: 'string' },

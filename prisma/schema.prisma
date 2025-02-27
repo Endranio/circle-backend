@@ -36,11 +36,12 @@ model Profile {
   id       String    @id @default(uuid())
  
   fullname String
+  
   avatarUrl String?
   bannerUrl String?
   bio String?
  
- user User @relation(fields:[userId], references:[id])
+ user User @relation(fields:[userId], references:[id],onDelete:Cascade)
  userId String @unique
 
  createdAt DateTime @default(now())

@@ -7,13 +7,13 @@ class UserService {
   }
 
   async createUser(data: CreateUserDTO) {
-    const { fullName, ...userData } = data;
+    const { fullname, ...userData } = data;
     return await prisma.user.create({
       data: {
         ...userData,
         profile: {
           create: {
-            fullname: data.fullName,
+            fullname: data.fullname,
           },
         },
       },
@@ -30,6 +30,10 @@ class UserService {
   async getUserByEmail(email: string) {
     return await prisma.user.findUnique({
       where: { email },
+
+      include: {
+        profile: true,
+      },
     });
   }
   async deleteUserById(id: string) {

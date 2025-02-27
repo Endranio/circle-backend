@@ -8,7 +8,7 @@ const createUserSchema = joi.object<CreateUserDTO>({
   username: joi.string().min(2).required(),
   password: joi.string().min(6).required(),
 
-  fullName: joi.string().required(),
+  fullname: joi.string().required(),
 });
 const updateUserSchema = joi.object<CreateUserDTO>({
   email: joi.string().email(),

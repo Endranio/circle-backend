@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user-service';
 import {
   createUserSchema,
@@ -6,15 +6,15 @@ import {
 } from '../utils/schemas/user-schema';
 
 class userController {
-  async getUsers(req: Request, res: Response) {
+  async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await userService.getUser();
       res.send(users);
-    } catch {
-      res.json(Error);
+    } catch (error) {
+      next(error);
     }
   }
-  async createUser(req: Request, res: Response) {
+  async createUser(req: Request, res: Response, next: NextFunction) {
     try {
       const body = req.body;
       const validated = await createUserSchema.validateAsync(body);
@@ -24,25 +24,25 @@ class userController {
       res.status(400).json((error as any).details);
     }
   }
-  async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await userService.getUserById(id);
       res.json(user);
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
-  async deleteUserById(req: Request, res: Response) {
+  async deleteUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await userService.deleteUserById(id);
       res.json(user);
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
-  async updateUserById(req: Request, res: Response) {
+  async updateUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const body = req.body;
@@ -66,7 +66,7 @@ class userController {
       const updatedUser = await userService.updateUserById(id, user);
       res.json(updatedUser);
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
 }

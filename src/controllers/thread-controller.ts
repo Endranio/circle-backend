@@ -1,19 +1,19 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import threadService from '../services/thread-service';
 import { createUserSchema } from '../utils/schemas/user-schema';
 import { createThreadSchema } from '../utils/schemas/thread-schema';
-import { v2 as cloudinary } from 'cloudinary';
-
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import fs from 'fs';
 class threadController {
-  async getThread(req: Request, res: Response) {
+  async getThread(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await threadService.getThread();
       res.send(users);
-    } catch {
-      res.json(Error);
+    } catch (error) {
+      next(error);
     }
   }
-  async createThread(req: Request, res: Response) {
+  async createThread(req: Request, res: Response, next: NextFunction) {
     /*  #swagger.requestBody = {
     required: true,
     content: {
@@ -26,12 +26,16 @@ class threadController {
 } 
 */
     try {
-      const uploadResult = await cloudinary.uploader.upload(
-        req.file?.path || '',
-      );
+      let uploadResult: UploadApiResponse = {} as UploadApiResponse;
+      if (req.file) {
+        uploadResult = await cloudinary.uploader.upload(req.file?.path || '');
+
+        fs.unlinkSync(`./tmp/my-uploads/${req.file.path}`);
+      }
+
       const body = {
         ...req.body,
-        images: uploadResult.secure_url,
+        images: uploadResult?.secure_url ?? undefined,
       };
       const userId = (req as any).user.id;
 
@@ -39,19 +43,21 @@ class threadController {
 
       const thread = await threadService.createThread(userId, validated);
       console.log('thread result', thread);
-      res.json(thread);
+      res.json({
+        message: 'Thread created',
+        data: { ...thread },
+      });
     } catch (error) {
-      console.log(error);
-      res.json(error);
+      next(error);
     }
   }
-  async getThreadById(req: Request, res: Response) {
+  async getThreadById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await threadService.getThreadById(id);
       res.json(user);
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
 }

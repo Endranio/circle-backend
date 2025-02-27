@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import authService from '../services/auth-service';
 import {
   forgotPasswordSchema,
@@ -13,7 +13,7 @@ import jwt from 'jsonwebtoken';
 import { transporter } from '../libs/nodemailer';
 
 class AuthController {
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response, next: NextFunction) {
     /*  #swagger.requestBody = {
             required: true,
             content: {
@@ -33,7 +33,7 @@ class AuthController {
 
       if (!user) {
         res.status(404).json({
-          mesaage: 'email/password is wrong',
+          message: 'email/password is wrong',
         });
         return;
       }
@@ -58,16 +58,17 @@ class AuthController {
         },
       );
 
-      res.send({
-        message: 'login success',
-        token,
+      const { password: unusedpassword, ...userResponse } = user;
+      res.status(200).send({
+        message: 'Login success',
+        data: { token, user: userResponse },
       });
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
 
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response, next: NextFunction) {
     /*  #swagger.requestBody = {
             required: true,
             content: {
@@ -82,6 +83,7 @@ class AuthController {
 
     try {
       const body = req.body;
+      console.log('body', body);
       const validated = await registerSchema.validateAsync(body);
       const hashedpassword = await bcrypt.hash(validated.password, 10);
       const registerBody: RegisterDTO = {
@@ -90,22 +92,37 @@ class AuthController {
       };
 
       const user = await authService.register(registerBody);
-      res.json(user);
+      res.status(200).json({
+        message: 'Register success',
+        data: { ...user },
+      });
     } catch (error) {
-      res.status(400).json((error as any).details);
+      next(error);
     }
   }
 
-  async check(req: Request, res: Response) {
+  async check(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = (req as any).user;
       const user = await userService.getUserById(payload.id);
-      res.send(user);
+
+      if (!user) {
+        res.status(404).json({
+          message: 'User not found',
+        });
+        return;
+      }
+
+      const { password: unusedpassword, ...userResponse } = user;
+      res.status(200).json({
+        message: 'User check success',
+        data: { ...user },
+      });
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
-  async forgot(req: Request, res: Response) {
+  async forgot(req: Request, res: Response, next: NextFunction) {
     /*  #swagger.requestBody = {
             required: true,
             content: {
@@ -130,24 +147,24 @@ class AuthController {
       const resetPasswordLink = `${frontend}/reset-password?token=${token}`;
 
       const mailOptions = {
-        form: 'endranio576@gmail.com',
+        from: 'endranio576@gmail.com',
         to: email,
         subject: 'Circle | Forgot Password',
-        // text:"e password email belum ada"
+
         html: `<h1>this link nya</h1>
-      <a href="${resetPasswordLink}">${resetPasswordLink}`,
+      <a href="${resetPasswordLink}">${resetPasswordLink}/>`,
       };
       await transporter.sendMail(mailOptions);
 
-      const user = await userService.getUserByEmail(email);
-      res.json({
-        messege: 'forgot password link send',
+      await userService.getUserByEmail(email);
+      res.status(201).json({
+        message: 'forgot password link send',
       });
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
-  async reset(req: Request, res: Response) {
+  async reset(req: Request, res: Response, next: NextFunction) {
     /*  #swagger.requestBody = {
     required: true,
     content: {
@@ -169,14 +186,14 @@ class AuthController {
 
       if (oldpassword === newpassword) {
         res.status(400).json({
-          messege: "password can't be same",
+          message: "Password can't be same",
         });
         return;
       }
 
       if (!user) {
         res.status(404).json({
-          messege: 'user not found',
+          message: 'User not found',
         });
         return;
       }
@@ -187,19 +204,20 @@ class AuthController {
       );
       if (!isOldPasswordCorect) {
         res.status(404).json({
-          messege: 'user not found',
+          message: 'Old password is wrong',
         });
         return;
       }
 
       const hashedNewPassword = await bcrypt.hash(newpassword, 10);
-      const updatedUSerPassword = await authService.resetPassword(
-        user.email,
-        hashedNewPassword,
-      );
-      res.send(updatedUSerPassword);
+      const { password, ...updatedUserPassword } =
+        await authService.resetPassword(user.email, hashedNewPassword);
+      res.status(200).json({
+        message: 'Reset password success!',
+        data: { ...updatedUserPassword },
+      });
     } catch (error) {
-      res.json(error);
+      next(error);
     }
   }
 }
