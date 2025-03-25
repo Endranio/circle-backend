@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import prisma from '../libs/prima';
+
 import threadController from '../controllers/thread-controller';
 import { initCloudinary } from '../middlewares/cloudinary-middleware';
 import { upload } from '../middlewares/upload-middleware';
@@ -7,8 +7,17 @@ import { authCheck } from '../middlewares/auth-middleware';
 
 const router = express.Router();
 
-router.get('/', threadController.getThread);
-router.get('/:id', threadController.getThreadById);
+router.get('/', authCheck, threadController.getThread);
+router.get('/user/:id', authCheck, threadController.getThreadByUser);
+router.get('/:id', authCheck, threadController.getThreadById);
+router.delete('/:id', authCheck, threadController.deleteThreadById);
+router.patch(
+  '/:id',
+  authCheck,
+  initCloudinary,
+  upload.single('images'),
+  threadController.updateThreadById,
+);
 router.post(
   '/',
   authCheck,

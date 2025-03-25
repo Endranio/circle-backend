@@ -1,9 +1,44 @@
-import { CreateUserDTO, UpdateUserDTO } from '../dtos/user-dtos';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UpdateUserProfileDTO,
+} from '../dtos/user-dtos';
 import prisma from '../libs/prima';
 
 class UserService {
-  async getUser() {
-    return await prisma.user.findMany();
+  async getUser(search?: string) {
+    return await prisma.user.findMany({
+      include: {
+        profile: true,
+      },
+    });
+  }
+  async getUserSearch(search?: string) {
+    if (search) {
+      return await prisma.user.findMany({
+        include: {
+          profile: true,
+        },
+        where: {
+          OR: [
+            {
+              username: {
+                contains: search,
+              },
+            },
+            {
+              profile: {
+                fullname: {
+                  contains: search,
+                },
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    return await prisma.user.findMany({ include: { profile: true } });
   }
 
   async createUser(data: CreateUserDTO) {
@@ -27,6 +62,16 @@ class UserService {
       },
     });
   }
+
+  async getUserByUsername(username: string) {
+    return await prisma.user.findUnique({
+      where: { username },
+      include: {
+        profile: true,
+        threads: true,
+      },
+    });
+  }
   async getUserByEmail(email: string) {
     return await prisma.user.findUnique({
       where: { email },
@@ -45,6 +90,28 @@ class UserService {
     return await prisma.user.update({
       where: { id },
       data,
+    });
+  }
+  async getProfileByUserId(userId: string) {
+    return await prisma.profile.findFirst({
+      where: { userId },
+      include: {
+        user: true,
+      },
+    });
+  }
+  async updateProfileByUserId(profileId: string, data: UpdateUserProfileDTO) {
+    const { username, ...profileData } = data;
+    return await prisma.profile.update({
+      where: { id: profileId },
+      data: {
+        ...profileData,
+        user: {
+          update: {
+            username: data.username,
+          },
+        },
+      },
     });
   }
 }

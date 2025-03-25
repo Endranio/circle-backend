@@ -40,10 +40,20 @@ const doc = {
           email: { type: 'string' },
         },
       },
+      UpdateUserProfileDTO: {
+        type: 'object',
+        properties: {
+          fullname: { type: 'string' },
+          username: { type: 'string' },
+          bio: { type: 'string' },
+          avatarUrl: { type: 'file' },
+          bannerUrl: { type: 'file' },
+        },
+      },
       ResetPasswordDTO: {
         type: 'object',
         properties: {
-          oldpassword: { type: 'string' },
+          confirmpassword: { type: 'string' },
           newpassword: { type: 'string' },
         },
       },
@@ -55,6 +65,25 @@ const doc = {
           },
           images: {
             type: 'file',
+          },
+        },
+      },
+      UpdateThreadDTO: {
+        type: 'object',
+        properties: {
+          content: {
+            type: 'string',
+          },
+          images: {
+            type: 'file',
+          },
+        },
+      },
+      CreateReplyDTO: {
+        type: 'object',
+        properties: {
+          content: {
+            type: 'string',
           },
         },
       },

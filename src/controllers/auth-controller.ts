@@ -83,7 +83,7 @@ class AuthController {
 
     try {
       const body = req.body;
-      console.log('body', body);
+
       const validated = await registerSchema.validateAsync(body);
       const hashedpassword = await bcrypt.hash(validated.password, 10);
       const registerBody: RegisterDTO = {
@@ -180,16 +180,16 @@ class AuthController {
     try {
       const payload = (req as any).user;
       const body = req.body;
-      const { oldpassword, newpassword } =
+      const { confirmpassword, newpassword } =
         await resetPasswordSchema.validateAsync(body);
       const user = await userService.getUserByEmail(payload.email);
 
-      if (oldpassword === newpassword) {
-        res.status(400).json({
-          message: "Password can't be same",
-        });
-        return;
-      }
+      // if (oldpassword === newpassword) {
+      //   res.status(400).json({
+      //     message: "Password canot same",
+      //   });
+      //   return;
+      // }
 
       if (!user) {
         res.status(404).json({
@@ -198,13 +198,14 @@ class AuthController {
         return;
       }
 
-      const isOldPasswordCorect = await bcrypt.compare(
-        oldpassword,
-        user.password,
-      );
+      // const isOldPasswordCorect = await bcrypt.compare(
+      //   oldpassword,
+      //   user.password,
+      // );
+      const isOldPasswordCorect = confirmpassword === newpassword;
       if (!isOldPasswordCorect) {
         res.status(404).json({
-          message: 'Old password is wrong',
+          message: 'Password must be same',
         });
         return;
       }

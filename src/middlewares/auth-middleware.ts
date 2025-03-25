@@ -13,7 +13,7 @@ export function authCheck(req: Request, res: Response, next: NextFunction) {
 
   if (!user) {
     res.status(401).json({
-      message: 'maaf ini secure',
+      message: 'User not found',
     });
     return;
   }

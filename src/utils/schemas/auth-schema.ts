@@ -15,7 +15,7 @@ const forgotPasswordSchema = joi.object<ForgotPasswordDTO>({
   email: joi.string().email().required(),
 });
 const resetPasswordSchema = joi.object<ResetPasswordDTO>({
-  oldpassword: joi.string().min(6).required(),
+  confirmpassword: joi.string().min(6).required(),
   newpassword: joi.string().min(6).required(),
 });
 const loginSchema = joi.object<RegisterDTO>({
