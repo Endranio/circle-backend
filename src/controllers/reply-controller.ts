@@ -7,7 +7,6 @@ class replyController {
     try {
       const threadId = req.params.threadId;
       const replies = await replyService.getReplies(threadId);
-      console.log('Replies sebelum mapping:', JSON.stringify(replies, null, 2));
       const userId = (req as any).user.id;
 
       const newReplies = await Promise.all(

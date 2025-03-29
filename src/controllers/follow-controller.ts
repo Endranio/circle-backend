@@ -1,72 +1,114 @@
-// import { NextFunction, Request, Response } from 'express';
-// import likeService from '../services/like-service';
-// import {
-//   createLikeSchema,
-//   deleteLikeSchema,
-// } from '../utils/schemas/like-schema';
-// import { createFollowSchema } from '../utils/schemas/follow-schema';
+import { NextFunction, Request, Response } from 'express';
+import followService from '../services/follow-service';
+import { createFollowSchema } from '../utils/schemas/follow-schema';
 
-// class FollowController {
-//   async createFollow(req: Request, res: Response, next: NextFunction) {
-//     /*  #swagger.requestBody = {
-//                   required: true,
-//                   content: {
-//                       "application/json": {
-//                           schema: {
-//                               $ref: "#/components/schemas/CreateLikeDTO"
-//                           }
-//                       }
-//                   }
-//               }
-//           */
+class FollowController {
+  async getFollowing(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { followedId } = req.params;
 
-//     try {
-//       const body = req.body;
-//       const userId = (req as any).user.id;
-//       const { followingId } = await createFollowSchema.validateAsync(body);
-//       const follow = await likeService.getLikeById(userId, followingId);
+      const userId = (req as any).user.id;
 
-//       // if (like) {
-//       //   res.status(400).json({
-//       //     message: 'You cannot like thread twice!',
-//       //   });
-//       //   return;
-//       // }
+      const following =
+        await followService.getFollowingByFollowedId(followedId);
+      const newFollow = await Promise.all(
+        following.map(async (follow) => {
+          const userfollow = await followService.getFollow(
+            userId,
+            follow.followingId,
+          );
+          const isFollow = userfollow ? true : false;
 
-//       await likeService.createLike(userId, followingId);
-//       res.json({
-//         message: 'Like success!',
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
+          return {
+            ...follow,
+            isFollow,
+          };
+        }),
+      );
 
-//   // async deleteLike(req: Request, res: Response, next: NextFunction) {
-//   //   try {
-//   //     const params = req.params;
-//   //     const userId = (req as any).user.id;
-//   //     const { threadId } = await deleteLikeSchema.validateAsync({
-//   //       threadId: params.threadId,
-//   //     });
+      res.json(newFollow);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getFollower(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { followingId } = req.params;
+      const follower =
+        await followService.getFollowerByFollowingId(followingId);
 
-//   //     const like = await likeService.getLikeById(userId, threadId);
+      const userId = (req as any).user.id;
 
-//   //     if (!like) {
-//   //       res.status(404).json({
-//   //         message: 'Like not found!',
-//   //       });
-//   //       return;
-//   //     }
+      const newFollow = await Promise.all(
+        follower.map(async (follow) => {
+          const userfollow = await followService.getFollow(
+            userId,
+            follow.follower.id,
+          );
+          const isFollow = userfollow ? true : false;
 
-//   //     await likeService.deleteLike(like.id);
-//   //     res.json({
-//   //       message: 'Unlike success!',
-//   //     });
-//   //   } catch (error) {
-//   //     next(error);
-//   //   }
-//   // }
-// }
+          return {
+            ...follow,
+            isFollow,
+          };
+        }),
+      );
 
-// export default new FollowController();
+      res.json(newFollow);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createFollow(req: Request, res: Response, next: NextFunction) {
+    /*  #swagger.requestBody = {
+                      required: true,
+                      content: {
+                          "application/json": {
+                              schema: {
+                                  $ref: "#/components/schemas/CreateFollowDTO"
+                              }  
+                          }
+                      }
+                  } 
+              */
+
+    try {
+      const body = req.body;
+
+      const { followedId, followingId } =
+        await createFollowSchema.validateAsync(body);
+
+      await followService.createFollow(followedId, followingId);
+      res.json({
+        message: 'followed success!',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteFollow(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { followedId, followingId } = req.params;
+
+      const follow = await followService.getFollow(followedId, followingId);
+
+      if (!follow) {
+        res.status(404).json({
+          message: 'Follow not found!',
+        });
+        return;
+      }
+
+      await followService.deleteFollow(follow.id);
+      res.json({
+        message: 'Unfollow success!',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+export default new FollowController();

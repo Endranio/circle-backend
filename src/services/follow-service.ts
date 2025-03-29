@@ -1,26 +1,54 @@
 import prisma from '../libs/prima';
 
-class LikeService {
-  async getLikeById(userId: string, threadId: string) {
-    return await prisma.like.findFirst({
+class FollowService {
+  async getFollowerByFollowingId(followingId: string) {
+    return await prisma.follow.findMany({
       where: {
-        userId,
-        threadId,
+        followingId,
+      },
+      include: {
+        follower: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+  }
+  async getFollowingByFollowedId(followedId: string) {
+    return await prisma.follow.findMany({
+      where: {
+        followedId,
+      },
+      include: {
+        following: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+  }
+  async getFollow(followedId: string, followingId: string) {
+    return await prisma.follow.findFirst({
+      where: {
+        followedId,
+        followingId,
       },
     });
   }
 
-  async createLike(followedId: string, followingId: string) {
+  async createFollow(followedId: string, followingId: string) {
     return await prisma.follow.create({
       data: { followedId, followingId },
     });
   }
 
-  async deleteLike(id: string) {
-    return await prisma.like.delete({
+  async deleteFollow(id: string) {
+    return await prisma.follow.delete({
       where: { id },
     });
   }
 }
 
-export default new LikeService();
+export default new FollowService();

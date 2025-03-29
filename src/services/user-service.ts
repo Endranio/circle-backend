@@ -13,11 +13,13 @@ class UserService {
       },
     });
   }
-  async getUserSearch(search?: string) {
+
+  async getUserSearch(search?: string, userId?: string) {
     if (search) {
       return await prisma.user.findMany({
         include: {
           profile: true,
+          // followings:true
         },
         where: {
           OR: [
@@ -59,6 +61,8 @@ class UserService {
       where: { id },
       include: {
         profile: true,
+        followers: true,
+        followings: true,
       },
     });
   }
@@ -69,6 +73,8 @@ class UserService {
       include: {
         profile: true,
         threads: true,
+        followers: true,
+        followings: true,
       },
     });
   }

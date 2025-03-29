@@ -6,6 +6,7 @@ import {
   updateUserSchema,
 } from '../utils/schemas/user-schema';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import followService from '../services/follow-service';
 
 class userController {
   async getUsers(req: Request, res: Response, next: NextFunction) {
@@ -20,13 +21,26 @@ class userController {
     try {
       const search = req.query.search as string;
 
+      const userId = (req as any).user.id;
       if (!search.trim()) {
         res.json([]);
         return;
       }
 
       const users = await userService.getUserSearch(search);
-      res.send(users);
+
+      const newUsers = await Promise.all(
+        users.map(async (user) => {
+          const userfollow = await followService.getFollow(userId, user.id);
+          const isFollow = userfollow ? true : false;
+
+          return {
+            ...user,
+            isFollow,
+          };
+        }),
+      );
+      res.send(newUsers);
     } catch (error) {
       next(error);
     }
@@ -45,7 +59,15 @@ class userController {
     try {
       const { id } = req.params;
       const user = await userService.getUserById(id);
-      res.json(user);
+      const followersCount = user?.followings.length;
+      const followingsCount = user?.followers.length;
+      const newUser = {
+        ...user,
+        followersCount,
+        followingsCount,
+      };
+
+      res.json(newUser);
     } catch (error) {
       next(error);
     }
@@ -125,8 +147,6 @@ class userController {
         avatarUrl?: Express.Multer.File[];
         bannerUrl?: Express.Multer.File[];
       }
-
-      console.log('Uploaded files:', req.files);
 
       const files = req.files as MulterFiles;
 

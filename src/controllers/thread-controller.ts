@@ -48,6 +48,7 @@ class threadController {
       const { id } = req.params;
       const userId = id;
       const userIdLike = (req as any).user.id;
+
       const threads = await threadService.getThreadByUser(userId);
       const newThread = await Promise.all(
         threads.map(async (thread) => {

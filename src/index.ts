@@ -4,7 +4,7 @@ import rootRouter from './routes/root-route';
 import authRouter from './routes/auth-route';
 import userRouter from './routes/user-route';
 import likeRouter from './routes/like-route';
-// import followRouter from './routes/follow-route';
+import followRouter from './routes/follow-route';
 import threadRouter from './routes/thread-route';
 import replyRouter from './routes/reply-route';
 import swaggerUi from 'swagger-ui-express';
@@ -53,7 +53,7 @@ app.use('/users', userRouter);
 app.use('/threads', threadRouter);
 app.use('/replies', replyRouter);
 app.use('/likes', likeRouter);
-// app.use('/follows', followRouter);
+app.use('/follows', followRouter);
 
 app.use(errorHandler);
 

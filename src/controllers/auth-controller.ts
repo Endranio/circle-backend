@@ -105,6 +105,13 @@ class AuthController {
     try {
       const payload = (req as any).user;
       const user = await userService.getUserById(payload.id);
+      const followersCount = user?.followers.length;
+      const followingsCount = user?.followings.length;
+      const newUser = {
+        ...user,
+        followersCount,
+        followingsCount,
+      };
 
       if (!user) {
         res.status(404).json({
@@ -113,10 +120,10 @@ class AuthController {
         return;
       }
 
-      const { password: unusedpassword, ...userResponse } = user;
+      const { password: unusedpassword, ...userResponse } = newUser;
       res.status(200).json({
         message: 'User check success',
-        data: { ...user },
+        data: { ...newUser },
       });
     } catch (error) {
       next(error);
