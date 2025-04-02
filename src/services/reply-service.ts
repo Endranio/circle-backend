@@ -34,6 +34,12 @@ class ReplyService {
       },
     });
   }
+
+  async deleteReply(id: string) {
+    return await prisma.reply.delete({
+      where: { id },
+    });
+  }
 }
 
 export default new ReplyService();

@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.get('/:threadId', authCheck, replyControler.getReplyByThreadId);
 router.post('/:threadId', authCheck, replyControler.createReply);
+router.delete('/:id', authCheck, replyControler.deleteReply);
 
 export default router;

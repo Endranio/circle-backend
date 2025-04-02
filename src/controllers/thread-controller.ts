@@ -155,7 +155,7 @@ class threadController {
     }
 } 
 */
-    console.log(req.body, 'thread');
+
     try {
       const { id } = req.params;
       const body = req.body;

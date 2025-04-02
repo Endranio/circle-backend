@@ -6,10 +6,63 @@ import {
 import prisma from '../libs/prima';
 
 class UserService {
-  async getUser(search?: string) {
+  async getUser(id: string) {
+    console.log(id, 'idlogin');
+    const followingUser = await prisma.user.findMany({
+      include: {
+        profile: true,
+        _count: {
+          select: { followings: true },
+        },
+      },
+      where: {
+        followers: {
+          some: {
+            followingId: id,
+          },
+        },
+        id: { not: id },
+      },
+
+      orderBy: [
+        {
+          followings: {
+            _count: 'desc',
+          },
+        },
+      ],
+    });
+
+    const otherUsers = await prisma.user.findMany({
+      include: {
+        profile: true,
+        _count: { select: { followings: true } },
+      },
+      where: {
+        followers: { none: { followingId: id } },
+        id: { not: id },
+      },
+      orderBy: {
+        followings: { _count: 'desc' },
+      },
+    });
+
+    return [...followingUser, ...otherUsers];
+  }
+
+  async getUsersSuggest(search?: string) {
     return await prisma.user.findMany({
       include: {
         profile: true,
+        _count: {
+          select: { followers: true },
+        },
+      },
+
+      orderBy: {
+        followers: {
+          _count: 'desc',
+        },
       },
     });
   }
@@ -19,7 +72,6 @@ class UserService {
       return await prisma.user.findMany({
         include: {
           profile: true,
-          // followings:true
         },
         where: {
           OR: [

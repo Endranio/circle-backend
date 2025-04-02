@@ -19,7 +19,11 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https//:circle.vercel.app'],
+    origin: [
+      'http://localhost:5173',
+      'https//:circle.vercel.app',
+      'http://localhost:4173',
+    ],
   }),
 );
 app.use(

@@ -11,7 +11,41 @@ import followService from '../services/follow-service';
 class userController {
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const users = await userService.getUser();
+      const id = (req as any).user.id;
+      console.log(id, 'k');
+      const users = await userService.getUser(id);
+      const newUsers = await Promise.all(
+        users.map(async (user) => {
+          const userfollow = await followService.getFollow(id, user.id);
+          const isFollow = userfollow ? true : false;
+
+          return isFollow
+            ? null
+            : {
+                ...user,
+                isFollow,
+              };
+        }),
+      );
+      const filteredUsers = newUsers.filter(Boolean);
+      res.send(filteredUsers);
+    } catch (error) {
+      console.log(error, 'ini');
+      next(error);
+    }
+  }
+  async getUsersSuggest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await userService.getUsersSuggest();
+
+      res.send(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getUsersByFollowers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await userService.getUsersSuggest();
       res.send(users);
     } catch (error) {
       next(error);

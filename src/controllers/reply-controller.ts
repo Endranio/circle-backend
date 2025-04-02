@@ -23,7 +23,7 @@ class replyController {
           };
         }),
       );
-      console.log('sesudah mapping', newReplies);
+
       res.json(newReplies);
     } catch (error) {
       next(error);
@@ -55,6 +55,16 @@ class replyController {
         message: 'Reply created',
         data: { ...reply },
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteReply(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      await replyService.deleteReply(id);
+      res.json('Delete success');
     } catch (error) {
       next(error);
     }
