@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "prepare": "husky",
-    "swagger": "ts-node swagger/swagger.ts"
+    "swagger": "ts-node swagger/swagger.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [
     "circle"
@@ -34,7 +35,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
     "rate-limit-redis": "^4.2.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "vercel": "^41.6.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
