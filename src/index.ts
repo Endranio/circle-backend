@@ -21,10 +21,9 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'https//:circle.vercel.app',
       'http://localhost:4173',
       'https://circle-backend-nu.vercel.app/',
-      'https://circle-kappa-two.vercel.app/',
+      'https://circle-kappa-two.vercel.app',
     ],
   }),
 );
