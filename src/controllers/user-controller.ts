@@ -112,7 +112,6 @@ class userController {
 
       res.json(newUser);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }

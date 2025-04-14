@@ -23,6 +23,7 @@ app.use(
       'http://localhost:5173',
       'https//:circle.vercel.app',
       'http://localhost:4173',
+      'https://circle-backend-nu.vercel.app/',
     ],
   }),
 );
