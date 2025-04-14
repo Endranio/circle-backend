@@ -5,7 +5,7 @@ import { RateLimit } from '../middlewares/rate-limit-middlewares';
 
 const router = express.Router();
 
-router.use(RateLimit('like'));
+// router.use(RateLimit('like'));
 
 router.post('/thread', authCheck, likeController.createLikeThread);
 router.delete('/thread/:threadId', authCheck, likeController.deleteLikeThread);

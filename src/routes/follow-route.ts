@@ -5,7 +5,7 @@ import { RateLimit } from '../middlewares/rate-limit-middlewares';
 
 const router = express.Router();
 
-router.use(RateLimit('follow'));
+// router.use(RateLimit('follow'));
 
 router.get('/following/:followedId', authCheck, followController.getFollowing);
 router.get('/follower/:followingId', authCheck, followController.getFollower);
