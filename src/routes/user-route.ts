@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', authCheck, userController.getUsers);
 router.get('/search', authCheck, userController.getUserSearch);
 router.post('/', userController.createUser);
-router.get('/:id', userController.getUserById);
+router.get('/:id', authCheck, userController.getUserById);
 router.get('/suggest', userController.getUsersSuggest);
 router.delete('/:id', userController.deleteUserById);
 router.patch('/:id', userController.updateUserById);

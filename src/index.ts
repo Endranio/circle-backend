@@ -33,8 +33,8 @@ app.use(
     customSiteTitle: 'Circle App API',
     customfavIcon: 'NONE',
     isExplorer: true,
-    customJs:
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    // customJs:
+    //   'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
     customCssUrl:
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
     customCss: `

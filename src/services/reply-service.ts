@@ -19,6 +19,11 @@ class ReplyService {
             profile: true,
           },
         },
+        thread: {
+          select: {
+            userId: true,
+          },
+        },
       },
     });
   }

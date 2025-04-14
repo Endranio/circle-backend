@@ -12,7 +12,7 @@ class userController {
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const id = (req as any).user.id;
-      console.log(id, 'k');
+
       const users = await userService.getUser(id);
       const newUsers = await Promise.all(
         users.map(async (user) => {
@@ -30,7 +30,6 @@ class userController {
       const filteredUsers = newUsers.filter(Boolean);
       res.send(filteredUsers);
     } catch (error) {
-      console.log(error, 'ini');
       next(error);
     }
   }
@@ -91,25 +90,36 @@ class userController {
   }
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = (req as any).user.id;
       const { id } = req.params;
       const user = await userService.getUserById(id);
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+
+      const userfollow = await followService.getFollow(userId, user.id);
+      const isFollow = userfollow ? true : false;
+
       const followersCount = user?.followings.length;
       const followingsCount = user?.followers.length;
       const newUser = {
         ...user,
         followersCount,
         followingsCount,
+        isFollow,
       };
 
       res.json(newUser);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
   async getUserByUsername(req: Request, res: Response, next: NextFunction) {
     try {
       const { username } = req.params;
-      console.log('Received username:', username);
+
       const user = await userService.getUserByUsername(username);
 
       res.json(user);
@@ -165,7 +175,7 @@ class userController {
     }
 } 
 */
-    console.log(req.body, 'ini body');
+
     try {
       const { userId } = req.params;
       let avatarUploadResult: UploadApiResponse = {} as UploadApiResponse;

@@ -17,7 +17,7 @@ const updateUserSchema = joi.object<CreateUserDTO>({
 const updateProfileSchema = joi.object<UpdateUserProfileDTO>({
   fullname: joi.string(),
   username: joi.string().min(2),
-  bio: joi.string(),
+  bio: joi.string().allow('').optional(),
   avatarUrl: joi.string().optional(),
   bannerUrl: joi.string().optional(),
 });

@@ -7,7 +7,6 @@ import prisma from '../libs/prima';
 
 class UserService {
   async getUser(id: string) {
-    console.log(id, 'idlogin');
     const followingUser = await prisma.user.findMany({
       include: {
         profile: true,
