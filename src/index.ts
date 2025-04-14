@@ -24,6 +24,7 @@ app.use(
       'https//:circle.vercel.app',
       'http://localhost:4173',
       'https://circle-backend-nu.vercel.app/',
+      'https://circle-kappa-two.vercel.app/',
     ],
   }),
 );
