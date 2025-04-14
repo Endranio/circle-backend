@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import threadService from '../services/thread-service';
 import { createUserSchema } from '../utils/schemas/user-schema';
+import streamifier from 'streamifier';
 import {
   createThreadSchema,
   updateThreadSchema,
 } from '../utils/schemas/thread-schema';
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, UploadStream } from 'cloudinary';
 import fs from 'fs';
 import likeService from '../services/like-service';
 class threadController {
@@ -86,16 +87,31 @@ class threadController {
 } 
 */
     try {
-      let uploadResult: UploadApiResponse = {} as UploadApiResponse;
-      if (req.file) {
-        uploadResult = await cloudinary.uploader.upload(req.file?.path || '');
+      let imageUrl: string = '';
 
-        // fs.unlinkSync(`./tmp/my-uploads/${req.file.path}`);
+      console.log(req.file);
+      if (req.file) {
+        imageUrl = await new Promise((resolve, reject) => {
+          if (req.file) {
+            try {
+              const stream = cloudinary.uploader.upload_stream(
+                {},
+                (error, result) => {
+                  if (error) return console.error(error);
+                  resolve(result?.secure_url || '');
+                },
+              );
+              streamifier.createReadStream(req.file.buffer).pipe(stream);
+            } catch (error) {
+              reject(error);
+            }
+          }
+        });
       }
 
       const body = {
         ...req.body,
-        images: uploadResult?.secure_url ?? undefined,
+        images: imageUrl ?? undefined,
       };
       const userId = (req as any).user.id;
 

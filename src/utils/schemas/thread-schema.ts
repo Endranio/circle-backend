@@ -1,10 +1,10 @@
-import joi, { optional } from 'joi';
+import joi from 'joi';
 import { CreateThreadDTO } from '../../dtos/thread-dtos';
 
 const createThreadSchema = joi
   .object<CreateThreadDTO>({
     content: joi.string().max(500).optional().allow('', null),
-    images: joi.string().optional(),
+    images: joi.string().optional().allow('', null),
   })
   .custom((value, helpers) => {
     if (!value.content && !value.images) {

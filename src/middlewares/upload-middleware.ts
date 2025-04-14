@@ -1,19 +1,22 @@
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
 import multer from 'multer';
-import path from 'path';
+dotenv.config();
 
 const whitelist = ['image/png', 'image/jpeg', 'image/jpg'];
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './tmp/my-uploads');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname),
-    );
-  },
+const storage = multer.memoryStorage();
+const uploadImage = multer({ storage });
+const uploadmiddleware = uploadImage.single('images');
+
+const cloud_name = process.env.CLOUD_NAME || '';
+const api_key = process.env.API_NAME || '';
+const api_secret = process.env.API_SECRET || '';
+
+cloudinary.config({
+  cloud_name,
+  api_key,
+  api_secret,
 });
 
 export const upload = multer({
