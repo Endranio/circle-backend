@@ -89,7 +89,6 @@ class threadController {
     try {
       let imageUrl: string = '';
 
-      console.log(req.file);
       if (req.file) {
         imageUrl = await new Promise((resolve, reject) => {
           if (req.file) {
@@ -182,9 +181,25 @@ class threadController {
         return;
       }
 
-      let uploadResult: UploadApiResponse = {} as UploadApiResponse;
+      let imageUrl: string = '';
+
       if (req.file) {
-        uploadResult = await cloudinary.uploader.upload(req.file.path || '');
+        imageUrl = await new Promise((resolve, reject) => {
+          if (req.file) {
+            try {
+              const stream = cloudinary.uploader.upload_stream(
+                {},
+                (error, result) => {
+                  if (error) return console.error(error);
+                  resolve(result?.secure_url || '');
+                },
+              );
+              streamifier.createReadStream(req.file.buffer).pipe(stream);
+            } catch (error) {
+              reject(error);
+            }
+          }
+        });
       }
 
       const validatedData = await updateThreadSchema.validateAsync(body);
@@ -192,8 +207,8 @@ class threadController {
       if (validatedData.content) {
         thread.content = validatedData.content;
       }
-      if (uploadResult?.secure_url) {
-        thread.images = uploadResult.secure_url;
+      if (imageUrl) {
+        thread.images = imageUrl;
       }
 
       const updatedThread = await threadService.updateThreadById(id, {
