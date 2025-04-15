@@ -18,6 +18,7 @@ router.patch(
   authCheck,
 
   upload.fields([{ name: 'avatarUrl' }, { name: 'bannerUrl' }]),
+
   userController.updateprofileByUserId,
 );
 

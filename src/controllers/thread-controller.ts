@@ -174,7 +174,6 @@ class threadController {
     try {
       const { id } = req.params;
       const body = req.body;
-
       const thread = await threadService.getThreadById(id);
       if (!thread) {
         res.status(404).json({ message: 'Thread not found' });

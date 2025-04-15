@@ -7,6 +7,7 @@ import {
 } from '../utils/schemas/user-schema';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import followService from '../services/follow-service';
+import streamifier from 'streamifier';
 
 class userController {
   async getUsers(req: Request, res: Response, next: NextFunction) {
@@ -176,16 +177,17 @@ class userController {
 */
 
     try {
-      const { userId } = req.params;
-      let avatarUploadResult: UploadApiResponse = {} as UploadApiResponse;
-      let bannerUploadResult: UploadApiResponse = {} as UploadApiResponse;
-      const profile = await userService.getProfileByUserId(userId);
+      const user = (req as any).user.id;
+      let avatarUploadResult: string = '';
+      let bannerUploadResult: string = '';
+      const profile = await userService.getProfileByUserId(user);
       if (!profile) {
         res.status(404).json({
           message: 'user not found',
         });
         return;
       }
+
       interface MulterFiles {
         avatarUrl?: Express.Multer.File[];
         bannerUrl?: Express.Multer.File[];
@@ -194,25 +196,55 @@ class userController {
       const files = req.files as MulterFiles;
 
       if (files.avatarUrl && files.avatarUrl.length > 0) {
-        avatarUploadResult = await cloudinary.uploader.upload(
-          files.avatarUrl[0].path,
-        );
+        avatarUploadResult = await new Promise((resolve, reject) => {
+          try {
+            if (files.avatarUrl) {
+              const stream = cloudinary.uploader.upload_stream(
+                {},
+                (error, result) => {
+                  if (error) return console.error(error);
+                  resolve(result?.secure_url || '');
+                },
+              );
+              streamifier
+                .createReadStream(files.avatarUrl[0].buffer)
+                .pipe(stream);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
       }
 
       if (files.bannerUrl && files.bannerUrl.length > 0) {
-        bannerUploadResult = await cloudinary.uploader.upload(
-          files.bannerUrl[0].path,
-        );
+        bannerUploadResult = await new Promise((resolve, reject) => {
+          try {
+            if (files.bannerUrl) {
+              const stream = cloudinary.uploader.upload_stream(
+                {},
+                (error, result) => {
+                  if (error) return console.error(error);
+                  resolve(result?.secure_url || '');
+                },
+              );
+              streamifier
+                .createReadStream(files.bannerUrl[0].buffer)
+                .pipe(stream);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
       }
+
       const body = {
         ...req.body,
-        avatarUrl:
-          avatarUploadResult?.secure_url ?? profile.avatarUrl ?? undefined,
-        bannerUrl:
-          bannerUploadResult?.secure_url ?? profile.bannerUrl ?? undefined,
+        avatarUrl: avatarUploadResult,
+        bannerUrl: bannerUploadResult,
       };
 
       const validatedData = await updateProfileSchema.validateAsync(body);
+
       const updatedProfile = await userService.updateProfileByUserId(
         profile.id,
         validatedData,

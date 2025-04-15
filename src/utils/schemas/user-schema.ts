@@ -18,8 +18,8 @@ const updateProfileSchema = joi.object<UpdateUserProfileDTO>({
   fullname: joi.string(),
   username: joi.string().min(2),
   bio: joi.string().allow('').optional(),
-  avatarUrl: joi.string().optional(),
-  bannerUrl: joi.string().optional(),
+  avatarUrl: joi.string().optional().allow(''),
+  bannerUrl: joi.string().optional().allow(''),
 });
 
 export { createUserSchema, updateUserSchema, updateProfileSchema };

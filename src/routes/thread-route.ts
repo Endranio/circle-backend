@@ -14,14 +14,12 @@ router.delete('/:id', authCheck, threadController.deleteThreadById);
 router.patch(
   '/:id',
   authCheck,
-
   upload.single('images'),
   threadController.updateThreadById,
 );
 router.post(
   '/',
   authCheck,
-
   upload.single('images'),
   threadController.createThread,
 );
